@@ -43,9 +43,9 @@ class Grass(Square):
             self.life += 1
         # Sanity checks
         if(self.life < 0):
-            self.life = 0.0
+            self.life = 0
         elif(self.life > Square.max_life):
-            self.life = float(Square.max_life)
+            self.life = Square.max_life
 
     def draw(self,screen):
         self.g = int( (self.life/Square.max_life) * 255 )
@@ -53,6 +53,14 @@ class Grass(Square):
         pygame.draw.rect(screen, c, pygame.Rect(self.x, self.y, Square.size, Square.size))
         self.r = 0
 
+class Soil(Square):
+    def __init__(self,x,y):
+        super().__init__(x,y)
+        self.type = "Soil"
+
+        self.r = 97
+        self.g = 63
+        self.b = 16
 
 class Water(Square):
     def __init__(self,x,y):
