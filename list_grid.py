@@ -64,7 +64,7 @@ class Grid:
                     if (p < 0.4):
                         self.cells[x][y][4] -= 1
                     elif (p < 0.8):
-                        self.cells[x][y][4] -= 1
+                        self.cells[x][y][4] += 1
                     # Sanity checks
                     if(cell[4] <= 0):
                         # Convert it to soil

@@ -63,6 +63,30 @@ class Grid:
                 world_y = y*square_size
                 self.cells[y][x] = world_builder(world_x,world_y)
 
+    def run(self):
+        for x in range(0, self.cols):
+            for y in range(0, self.rows):
+                cell = self.cells[y][x]
+                if (types[cell['type']] == "Grass"):
+                    p = random.random()
+                    if (p < 0.4):
+                        self.cells[y][x][4] -= 1
+                    elif (p < 0.6):
+                        self.cells[y][x][4] -= 1
+                    # Sanity checks
+                    if(cell['life'] <= 0):
+                        # Convert it to soil
+                        self.cells[y][x] = elements["Soil"]
+                    elif(cell['life'] > 100):
+                        self.cells[y][x]['life'] = 100
+                elif (types[cell['type']] == "Soil"):
+                    if ((x + 3 > self.cols) or (y+3 > self.rows)): continue
+                    grass_sum = (self.cells[y:y+3,x:x+3]['type'] == 3).sum()
+                    if grass_sum.sum() > 3:
+                        self.cells[y][x] = elements["Grass"]
+
+
+
     def draw(self,screen):
         for x in range(0, self.cols):
             for y in range(0, self.rows):
@@ -85,7 +109,7 @@ while not done:
                         quit()
 
         # Run the world
-        #grid.run()
+        grid.run()
         grid.draw(screen)
 
         pygame.display.flip()
