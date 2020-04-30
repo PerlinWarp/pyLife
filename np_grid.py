@@ -24,35 +24,30 @@ grid = np.zeros((rows, cols), dtype=grid_dtype)
 
 
         #   "Type":  [Type, R.G,B, Life]
-elements = {"Rock":  (0, 128,128,128, 0), 
+elements = {"Rock":  (0, 128,128,128, 255), 
             "Water": (1,   0,  0,120, 0),
             "Soil":  (2,  97, 63, 16, 0),
             "Grass": (3,  20,100, 20, 100),
-            "Lava":  (4, 255,160,  0, 255)
+            "Lava":  (4, 255,100,  0, 255)
 }
 types = list(elements.keys())
 type_to_num = {}
 for n, t in enumerate(types):
     type_to_num[t] = n
 
-colours = {"Rock":  (128,128,128), 
-           "Water": (  0,  0,120),
-           "Soil":  ( 97, 63, 16),
-           "Grass": ( 20,100, 20),
-           "Lava":  (255,160,  0)
-}
-
 
 def world_builder(x,y):
     r = random.random()
     circle = (x - w_width//2)**2 + (y - w_height//2)**2
 
-    if (r < 0.01):
+    if (circle < 300 or r < 0.001):
         return elements["Lava"]
     if (circle < r * 150**2):
         return elements["Rock"]
     if (circle < r * 300**2):
         return elements["Grass"]
+    if r < 0.01:
+        return elements["Soil"]
     else:
         return elements["Water"]
 
@@ -91,6 +86,11 @@ class Grid:
                         self.cells[y][x][4] -= 1
                     elif (p < 0.8):
                         self.cells[y][x][4] += 1
+                    elif (p > 0.99999):
+                        # Lightning Strikes
+                        self.cells[y][x] = elements['Lava']
+                        self.cells[y][x]['life'] = 1
+                        self.cells[y][x]['b'] = 200
                     # Sanity checks
                     if(cell['life'] <= 0):
                         # Convert it to soil
@@ -102,9 +102,9 @@ class Grid:
                     if ((x + 2 > self.cols) or (y+2 > self.rows)): continue
                     if ((x - 1 < 0) or (y-1 < 0)): continue
                     lava_sum = (self.cells[y-1:y+2,x-1:x+2]['type'] == 4).sum()
-                    if lava_sum.sum() > 1 and random.random() > 0.6:
+                    if lava_sum.sum() > 0 and random.random() < 0.1:
                         self.cells[y][x] = elements["Lava"]
-                        self.cells[y][x]['life'] = 10 
+                        self.cells[y][x]['life'] = 2 
 
                 elif (types[cell['type']] == "Soil"):
                     # If soil has more than 3 grass neighbours, make it grass
@@ -114,10 +114,14 @@ class Grid:
                     
                     if grass_sum > 2:
                         self.cells[y][x] = elements["Grass"]
+                        self.cells[y][x]['life'] = 20
                     elif grass_sum > 0 and random.random() < 0.2:
                         self.cells[y][x] = elements["Grass"]
+                        self.cells[y][x]['life'] = 10
                     elif (random.random() < 0.001):
                         self.cells[y][x] = elements["Grass"]
+                        self.cells[y][x]['life'] = 5
+
 
                 
                 elif (types[cell['type']] == "Water"):
@@ -127,9 +131,10 @@ class Grid:
                     lava_sum = (self.cells[y-1:y+2,x-1:x+2]['type'] == 4).sum()
 
                     if (lava_sum == 0): continue
-                    if lava_sum > 3:
+                    if lava_sum > 5:
                         self.cells[y][x] = elements["Lava"]
-                    else:
+                        self.cells[y][x]['life'] = 10   
+                    elif lava_sum > 3:
                         self.cells[y][x] = elements["Rock"]
                 
                 elif (types[cell['type'] == "Lava"]):
@@ -137,6 +142,7 @@ class Grid:
                         self.cells[y][x] = elements['Soil']
                     elif cell['life'] < 255:
                         cell['life'] -= 1
+                        cell['g'] = 0
 
 
 
