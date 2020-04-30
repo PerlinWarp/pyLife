@@ -20,11 +20,7 @@ cells = [[0 for i in range(rows)] for j in range(cols)]
 grid_dtype = np.dtype({'names':('type', 'r', 'g', 'b', 'life'),
                       'formats':('B', 'B', 'B', 'B', 'B')}
 )
-print(grid_dtype)
 grid = np.zeros((rows, cols), dtype=grid_dtype)
-
-print(grid[0][0]['type'])
-
 
 
         #   "Type":  [Type, R.G,B, Life]
@@ -32,9 +28,20 @@ elements = {"Rock":  (0, 128,128,128, 0),
             "Water": (1,   0,  0,120, 0),
             "Soil":  (2,  97, 63, 16, 0),
             "Grass": (3,  20,100, 20, 100),
-            "Lava":  (4, 255,160,  0, 0)
+            "Lava":  (4, 255,160,  0, 255)
 }
 types = list(elements.keys())
+type_to_num = {}
+for n, t in enumerate(types):
+    type_to_num[t] = n
+
+colours = {"Rock":  (128,128,128), 
+           "Water": (  0,  0,120),
+           "Soil":  ( 97, 63, 16),
+           "Grass": ( 20,100, 20),
+           "Lava":  (255,160,  0)
+}
+
 
 def world_builder(x,y):
     r = random.random()
@@ -63,37 +70,82 @@ class Grid:
                 world_y = y*square_size
                 self.cells[y][x] = world_builder(world_x,world_y)
 
+    def count_neighbours(self, c_type):
+        """Game of life step using generator expressions"""
+        nbrs_count = sum(np.roll(np.roll(self.cells == c_type , i, 0), j, 1)
+                         for i in (-1, 0, 1) for j in (-1, 0, 1)
+                         if (i != 0 or j != 0))
+        return nbrs_count
+
     def run(self):
         for x in range(0, self.cols):
             for y in range(0, self.rows):
                 cell = self.cells[y][x]
+                
                 if (types[cell['type']] == "Grass"):
+                    # Set the colour 
+                    self.cells[y][x]['g'] = self.cells[y][x]['life']
+
                     p = random.random()
                     if (p < 0.4):
                         self.cells[y][x][4] -= 1
-                    elif (p < 0.6):
-                        self.cells[y][x][4] -= 1
+                    elif (p < 0.8):
+                        self.cells[y][x][4] += 1
                     # Sanity checks
                     if(cell['life'] <= 0):
                         # Convert it to soil
                         self.cells[y][x] = elements["Soil"]
                     elif(cell['life'] > 100):
                         self.cells[y][x]['life'] = 100
+
+                    # If grass is next to lava, set it on fire
+                    if ((x + 2 > self.cols) or (y+2 > self.rows)): continue
+                    if ((x - 1 < 0) or (y-1 < 0)): continue
+                    lava_sum = (self.cells[y-1:y+2,x-1:x+2]['type'] == 4).sum()
+                    if lava_sum.sum() > 1 and random.random() > 0.6:
+                        self.cells[y][x] = elements["Lava"]
+                        self.cells[y][x]['life'] = 10 
+
                 elif (types[cell['type']] == "Soil"):
-                    if ((x + 3 > self.cols) or (y+3 > self.rows)): continue
-                    grass_sum = (self.cells[y:y+3,x:x+3]['type'] == 3).sum()
-                    if grass_sum.sum() > 3:
+                    # If soil has more than 3 grass neighbours, make it grass
+                    if ((x + 2 > self.cols) or (y+2 > self.rows)): continue
+                    if ((x - 1 < 0) or (y-1 < 0)): continue
+                    grass_sum = (self.cells[y-1:y+2,x-1:x+2]['type'] == 3).sum()
+                    
+                    if grass_sum > 2:
                         self.cells[y][x] = elements["Grass"]
+                    elif grass_sum > 0 and random.random() < 0.2:
+                        self.cells[y][x] = elements["Grass"]
+                    elif (random.random() < 0.001):
+                        self.cells[y][x] = elements["Grass"]
+
+                
+                elif (types[cell['type']] == "Water"):
+                    # If water has more than 3 lava neighbours, make it rock
+                    if ((x + 2 > self.cols) or (y+2 > self.rows)): continue
+                    if ((x - 1 < 0) or (y-1 < 0)): continue
+                    lava_sum = (self.cells[y-1:y+2,x-1:x+2]['type'] == 4).sum()
+
+                    if (lava_sum == 0): continue
+                    if lava_sum > 3:
+                        self.cells[y][x] = elements["Lava"]
+                    else:
+                        self.cells[y][x] = elements["Rock"]
+                
+                elif (types[cell['type'] == "Lava"]):
+                    if cell['life'] == 0:
+                        self.cells[y][x] = elements['Soil']
+                    elif cell['life'] < 255:
+                        cell['life'] -= 1
 
 
 
     def draw(self,screen):
-        for x in range(0, self.cols):
-            for y in range(0, self.rows):
-                cell = self.cells[y][x]
-                c = (cell['r'], cell['g'], cell['b'])
-                pygame.draw.rect(screen, c, pygame.Rect(x*square_size, y*square_size, square_size, square_size))
-
+        s = np.stack([self.cells['r'], self.cells['g'], self.cells['b']]).T
+        # Stretch the image out
+        s = np.repeat(np.repeat(s,10, axis=0), 10, axis=1)
+        surf = pygame.surfarray.make_surface(s)
+        screen.blit(surf, (0, 0))
 
 pygame.init()
 w_width = settings.w_width
