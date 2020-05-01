@@ -152,22 +152,3 @@ class Grid:
         s = np.repeat(np.repeat(s,10, axis=0), 10, axis=1)
         surf = pygame.surfarray.make_surface(s)
         screen.blit(surf, (0, 0))
-
-pygame.init()
-w_width = settings.w_width
-w_height = settings.w_height
-screen = pygame.display.set_mode((w_width, w_height))
-done = False
-
-# Making our world
-grid = Grid(w_width, w_height, screen)
-while not done:
-        for event in pygame.event.get():
-                if event.type == pygame.QUIT:
-                        quit()
-
-        # Run the world
-        grid.run()
-        grid.draw(screen)
-
-        pygame.display.flip()
