@@ -1,6 +1,6 @@
+import pygame
 import random
 import numpy as np 
-import pygame
 import settings
 
 w_width = settings.w_width
@@ -152,3 +152,9 @@ class Grid:
         s = np.repeat(np.repeat(s,10, axis=0), 10, axis=1)
         surf = pygame.surfarray.make_surface(s)
         screen.blit(surf, (0, 0))
+
+    def get_cell(self,x,y):
+        # Convert the world space to cell space
+        x = x // square_size
+        y = y // square_size
+        return self.cells[y][x]

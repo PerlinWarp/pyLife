@@ -6,9 +6,7 @@ import os
 
 import settings
 from np_grid import Grid
-from agent import Agent
-from player_agent import Player, Player2
-import neat_agent
+from player_agent import Player2
 
 
 pygame.init()
@@ -22,7 +20,7 @@ grid = Grid(w_width, w_height, screen)
 grid.draw(screen)
 
 # Making an agent
-player = Player2(w_width//2, w_height//2)
+player = Player2(random.randint(10,w_width//2), w_height//2)
 agents = [player]
 
 while not done:
