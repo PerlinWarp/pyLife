@@ -6,7 +6,7 @@ import os
 
 import settings
 from np_grid import Grid
-from player_agent import Player2
+from player_agent import Player
 
 
 pygame.init()
@@ -14,23 +14,35 @@ w_width = settings.w_width
 w_height = settings.w_height
 screen = pygame.display.set_mode((w_width, w_height))
 done = False
+draw = True
 
 # Making our world
 grid = Grid(w_width, w_height, screen)
 grid.draw(screen)
 
 # Making an agent
-player = Player2(random.randint(10,w_width//2), w_height//2)
+player = Player(random.randint(100,w_width//2), w_height//3, grid)
 agents = [player]
 
 while not done:
         for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                        quit()
+                        pygame.quit()
+                        done = True
+                elif event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_r:
+                        if draw:
+                            draw = False
+                            print("Rendering disabled...")
+                        else:
+                            print("Rendering enabled...")
+                            draw = True
+
+
 
         # Run the world
         grid.run()
-        grid.draw(screen)
+        if (draw): grid.draw(screen)
 
 
         # Run the agents
@@ -43,7 +55,7 @@ while not done:
                         del agent
                 else:
                     agent.run(grid)
-                    agent.draw(screen)
+                    if (draw): agent.draw(screen)
 
 
         pygame.display.flip()

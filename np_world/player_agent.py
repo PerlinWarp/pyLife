@@ -1,10 +1,10 @@
 import pygame
-from agent2 import Agent2
+from agent import Agent
 import numpy as np
 
-class Player2(Agent2):
-    def __init__(self,x,y):
-        super().__init__(x,y)
+class Player(Agent):
+    def __init__(self,x,y,grid):
+        super().__init__(x,y,grid)
         self.type = "Player2"
         self.c = (255,255,255)
         self.action = None

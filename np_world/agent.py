@@ -1,5 +1,6 @@
 import pygame
 import numpy as np
+from enum import Enum
 
 import settings
 from np_grid import type_to_num
@@ -10,8 +11,12 @@ square_size = settings.square_size
 agent_size = square_size
 max_life = 100
 
-class Agent2():
-    def __init__(self,x,y):
+class State(Enum):
+    ALIVE = 0
+    ON_FIRE = 1
+
+class Agent():
+    def __init__(self,x,y, grid):
         self.x = x
         self.y = y
         self.life = max_life
@@ -22,24 +27,51 @@ class Agent2():
         self.actions = ["left", "right", "forward"]
         self.degrees = 0
         self.infront_x = self.x 
-        self.infront_y = self.y + 10
+        self.infront_y = self.y + 10 
+
+        self.cell = grid.get_cell(self.x,self.y)
+        self.state = State.ALIVE
+
+
+    def interact(self):
+        c = self.cell 
+        if (c['type'] == type_to_num["Water"]):
+            self.life -= 1
+            return -1
+        elif (c['type'] == type_to_num["Lava"]):
+            self.life -= 10
 
     def eat(self, grid):
-        c = grid.get_cell(self.x,self.y) 
+        c = self.cell 
+
         if (c['type'] == type_to_num["Grass"]):
             if (c['life'] > 10):
                 c['life'] -= 10
                 self.life += 10
                 return 10
             return 0
+
         elif (c['type'] == type_to_num["Water"]):
             self.life -= 1
+            if self.state == State.ON_FIRE:
+                self.state = State.ALIVE
+                return 50
+
             return -1
+
         elif (c['type'] == type_to_num["Lava"]):
             self.life -= 10
-            return -10
+
+            if self.state == State.ALIVE:
+                # You just set yourself on fire
+                self.state = State.ON_FIRE
+                return -50
+            else:
+                return -10
+
         elif (c['type'] == type_to_num["Rock"] or c['type'] == type_to_num["Soil"]):
             return 0
+
         else:
             raise ValueError("Unknown cell type")
 
@@ -48,6 +80,7 @@ class Agent2():
         self.move(action)
 
     def run(self, grid):
+        self.cell = grid.get_cell(self.x,self.y)
         self.life -= 1
         self.alive_time += 1
         if (self.life > max_life):
@@ -102,4 +135,7 @@ class Agent2():
         if (abs(self.infront_x - self.x) == agent_size or abs(self.infront_y - self.y) == agent_size ):
             # Dont draw the line if would cut across the screen
             pygame.draw.line(screen, (255,255,255), [self.x, self.y], [self.infront_x, self.infront_y])
-        pygame.draw.circle(screen, self.c, (self.x, self.y), agent_size//2)
+        if self.state == State.ON_FIRE:
+            pygame.draw.circle(screen, (255,0,0), (self.x, self.y), agent_size//2)
+        else:
+            pygame.draw.circle(screen, self.c, (self.x, self.y), agent_size//2)
