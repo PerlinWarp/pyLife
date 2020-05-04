@@ -36,11 +36,11 @@ class Player2(Agent2):
 
     def live(self, grid, reward):
         # See the square below us:
-        c = grid.get_cell(self.x,self.y)
+        #c = grid.get_cell(self.x,self.y)
         #print("We are on", c.type)
 
         # Get the square infront of us
-        c = grid.get_cell(self.infront_x,self.infront_y)
+        #c = grid.get_cell(self.infront_x,self.infront_y)
         #print(c.type)
 
         # DEBUG: Infinite life

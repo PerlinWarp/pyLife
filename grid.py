@@ -77,7 +77,7 @@ class Grid:
             for j in range(self.rows):
                 self.cells[i][j].run()
                 #if (random.random() < 0.01):
-                self.rules(i,j)
+                #self.rules(i,j)
     
     def draw(self,screen):
         for i in self.cells:
@@ -99,5 +99,3 @@ class Grid:
         s = self.cells[x][y]
         s.life -= life;
         self.cells[x][y].r = 255
-
-

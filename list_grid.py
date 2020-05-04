@@ -59,7 +59,8 @@ class Grid:
         for x in range(0, self.cols):
             for y in range(0, self.rows):
                 cell = self.cells[x][y]
-                if (types[cell[0]] == "Grass"):
+                t = types(cell[0])
+                if (t == "Grass"):
                     p = random.random()
                     if (p < 0.4):
                         self.cells[x][y][4] -= 1
@@ -71,6 +72,8 @@ class Grid:
                         self.cells[x][y] = elements["Soil"]
                     elif(cell[4] > 100):
                         self.cells[x][y][4] = 100
+                elif (t == "Soil"):
+                    if (t == "")
 
         #if (random.random() < 0.01):
         #self.rules(i,j)
