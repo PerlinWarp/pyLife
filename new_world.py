@@ -28,7 +28,7 @@ while not done:
         for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                         pygame.quit()
-                        done = True
+                        quit()
                 elif event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_r:
                         if draw:
@@ -38,12 +38,9 @@ while not done:
                             print("Rendering enabled...")
                             draw = True
 
-
-
         # Run the world
         grid.run()
         if (draw): grid.draw(screen)
-
 
         # Run the agents
         for agent in agents:

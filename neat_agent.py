@@ -1,15 +1,17 @@
+import random
 import neat 
-from agent2 import *
 import numpy as np
 
-class NEAT_agent(Agent2):
+from agent import *
+
+class NEAT_agent(Agent):
     '''
     An agent which uses a LookUpTable as a brain 
     Inputs are RGB of the cell they are on. 
     Ouput is one of, Up, Down, Left or Right 
     '''
     def __init__(self,x,y,grid,brain,ge):
-        super().__init__(x,y)
+        super().__init__(x,y,grid)
         self.type = "NEAT Agent"
         self.c = (random.randint(0,255),random.randint(0,255),255)
 
@@ -19,7 +21,7 @@ class NEAT_agent(Agent2):
         # Get an inital input
         c = grid.get_cell(self.x,self.y)
         c_n = grid.get_cell(self.infront_x,self.infront_y)
-        senses = (self.degrees, c.r, c.g, c.b, c_n.r, c_n.g, c_n.b)
+        senses = (self.degrees, c['r'], c['g'], c['b'], c_n['r'], c_n['g'], c_n['b'])
         self.input = senses
         self.last_action = "forward"
 
@@ -30,7 +32,7 @@ class NEAT_agent(Agent2):
         # Get our new input 
         c = grid.get_cell(self.x,self.y)
         c_n = grid.get_cell(self.infront_x,self.infront_y)
-        self.input = (self.degrees, c.r, c.g, c.b, c_n.r, c_n.g, c_n.b)
+        self.input = (self.degrees, c['r'], c['g'], c['b'], c_n['r'], c_n['g'], c_n['b'])
 
         output = self.brain.activate(self.input)
 
@@ -58,7 +60,7 @@ class Population():
             self.agents.append(NEAT_agent(x,y,grid,net,g))
 
 
-    def run(self):
+    def run(self, draw):
         if (len(self.agents) > 0):
             for x,agent in enumerate(self.agents):
                 if (agent.life < 1):
@@ -66,7 +68,7 @@ class Population():
                     self.agents.pop(x)
                 else:
                     agent.run(self.grid)
-                    agent.draw(self.screen) 
+                    if(draw): agent.draw(self.screen) 
             return False 
         else:
             return True              

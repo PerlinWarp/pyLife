@@ -5,9 +5,9 @@ import neat
 import os
 
 import settings
-from grid import Grid
+from np_grid import Grid
 from agent import Agent
-from player_agent import Player, Player2
+from player_agent import Player
 import neat_agent
 
 # Get the NEAT config file
@@ -23,6 +23,8 @@ def main(genomes, config):
     w_height = settings.w_height
     screen = pygame.display.set_mode((w_width, w_height))
     done = False
+    draw = True
+
 
     # Making our world
     grid = Grid(w_width, w_height, screen)
@@ -35,15 +37,23 @@ def main(genomes, config):
             for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                             quit()
+                    elif event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_r:
+                            if draw:
+                                draw = False
+                                print("Rendering disabled...")
+                            else:
+                                print("Rendering enabled...")
+                                draw = True
 
             # Run the world
             grid.run()
-            grid.draw(screen)
+            if (draw): grid.draw(screen)
 
             # Run the genetic agents
-            done = genetic_agents.run()
+            done = genetic_agents.run(draw)
 
-            pygame.display.flip()
+            if (draw): pygame.display.flip()
 
 # Create a population
 p = neat.Population(config)
