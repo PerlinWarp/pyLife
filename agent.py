@@ -1,5 +1,6 @@
 import pygame
 import numpy as np
+import copy
 from enum import Enum
 
 import settings
@@ -52,12 +53,12 @@ class Agent():
             return 0
 
         elif (c['type'] == type_to_num["Water"]):
-            self.life -= 1
+            self.life -= 2
             if self.state == State.ON_FIRE:
                 self.state = State.ALIVE
                 return 50
 
-            return -1
+            return -2
 
         elif (c['type'] == type_to_num["Lava"]):
             self.life -= 10
@@ -71,16 +72,22 @@ class Agent():
 
         elif (c['type'] == type_to_num["Rock"] or c['type'] == type_to_num["Soil"]):
             return 0
-
+        elif (c['type'] == type_to_num["Agent"]):
+            # Find the agent we just stepped on
+            # TODO: Impliment murder...
+            return -10
         else:
-            raise ValueError("Unknown cell type")
+            raise ValueError("Unknown cell type", c['type'])
 
     def live(self, grid, reward):
         action = random.choice(self.actions)
         self.move(action)
 
     def run(self, grid):
-        self.cell = grid.get_cell(self.x,self.y)
+        self.cell = copy.deepcopy(grid.get_cell(self.x,self.y))
+        old_x, old_y = self.x, self.y
+        grid.cells[self.y//square_size][self.x//square_size]['type'] = type_to_num['Agent']
+
         self.life -= 1
         self.alive_time += 1
         if (self.life > max_life):
@@ -88,6 +95,9 @@ class Agent():
 
         reward = self.eat(grid)
         self.live(grid, reward)
+
+        # Set the grid back
+        grid.cells[old_y//square_size][old_x//square_size] = self.cell
 
     def move(self, action):
         if (action):

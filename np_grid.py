@@ -23,12 +23,14 @@ grid_dtype = np.dtype({'names':('type', 'r', 'g', 'b', 'life'),
 grid = np.zeros((rows, cols), dtype=grid_dtype)
 
 
-        #   "Type":  [Type, R.G,B, Life]
-elements = {"Rock":  (0, 128,128,128, 255), 
-            "Water": (1,   0,  0,120, 0),
-            "Soil":  (2,  97, 63, 16, 0),
-            "Grass": (3,  20,100, 20, 100),
-            "Lava":  (4, 255,100,  0, 255)
+        #   "Type":  [Type,  R. G, B, Life]
+elements = {"Rock":  (  0, 128,128,128, 255), 
+            "Water": (  1,   0,  0,120,   0),
+            "Soil":  (  2,  97, 63, 16,   0),
+            "Grass": (  3,  20,100, 20, 100),
+            "Lava":  (  4, 255,100,  0, 255),
+            "Agent": (  5, 255,100,  0, 255)
+
 }
 types = list(elements.keys())
 type_to_num = {}

@@ -24,7 +24,7 @@ class Player(Agent):
         pressed = pygame.key.get_pressed()
         action = None
         if (pressed[pygame.K_UP] or pressed[pygame.K_LEFT] or pressed[pygame.K_RIGHT]):
-            if pressed[pygame.K_UP]: self.action = "forward"
+            if pressed[pygame.K_UP]: super().move("forward")
             if pressed[pygame.K_LEFT]: self.action = "left"
             if pressed[pygame.K_RIGHT]: self.action = "right"
         else:

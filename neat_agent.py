@@ -19,7 +19,7 @@ class NEAT_agent(Agent):
         self.ge = ge
 
         # Get an inital input
-        c = grid.get_cell(self.x,self.y)
+        c = self.cell
         c_n = grid.get_cell(self.infront_x,self.infront_y)
         senses = (self.degrees, c['r'], c['g'], c['b'], c_n['r'], c_n['g'], c_n['b'])
         self.input = senses
@@ -30,7 +30,7 @@ class NEAT_agent(Agent):
 
         last_input = self.input
         # Get our new input 
-        c = grid.get_cell(self.x,self.y)
+        c = self.cell
         c_n = grid.get_cell(self.infront_x,self.infront_y)
         self.input = (self.degrees, c['r'], c['g'], c['b'], c_n['r'], c_n['g'], c_n['b'])
 
