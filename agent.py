@@ -74,8 +74,14 @@ class Agent():
             return 0
         elif (c['type'] == type_to_num["Agent"]):
             # Find the agent we just stepped on
-            # TODO: Impliment murder...
-            return -10
+            if self.life > c['life']:
+                # Eat the other agent
+                self.life += 20
+                return 20
+            else:
+                # Get eaten
+                self.life -= 20
+                return -20 
         else:
             raise ValueError("Unknown cell type", c['type'])
 
@@ -87,6 +93,8 @@ class Agent():
         self.cell = copy.deepcopy(grid.get_cell(self.x,self.y))
         old_x, old_y = self.x, self.y
         grid.cells[self.y//square_size][self.x//square_size]['type'] = type_to_num['Agent']
+        grid.cells[self.y//square_size][self.x//square_size]['life'] = self.life
+
 
         self.life -= 1
         self.alive_time += 1
