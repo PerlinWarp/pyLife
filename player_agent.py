@@ -23,10 +23,18 @@ class Player(Agent):
         
         pressed = pygame.key.get_pressed()
         action = None
+        spike = True
         if (pressed[pygame.K_UP] or pressed[pygame.K_LEFT] or pressed[pygame.K_RIGHT]):
             if pressed[pygame.K_UP]: super().move("forward")
             if pressed[pygame.K_LEFT]: self.action = "left"
             if pressed[pygame.K_RIGHT]: self.action = "right"
+        
+            if pressed[pygame.K_s]: spike = True
+
         else:
             super().move(self.action)
             self.action = None
+
+            if spike:
+                self.spike_extended = not self.spike_extended
+            spike = False

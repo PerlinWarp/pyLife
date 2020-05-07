@@ -12,6 +12,7 @@ from player_agent import Player
 pygame.init()
 w_width = settings.w_width
 w_height = settings.w_height
+square_size = settings.square_size
 screen = pygame.display.set_mode((w_width, w_height))
 done = False
 draw = True
@@ -21,7 +22,10 @@ grid = Grid(w_width, w_height, screen)
 grid.draw(screen)
 
 # Making an agent
-player = Player(random.randint(100,w_width//2), w_height//3, grid)
+x = w_width//2 + random.randint(1,w_width//square_size//3) * square_size
+y = w_height//2 + random.randint(1,w_height//square_size//3) * square_size
+
+player = Player(x,y, grid)
 agents = [player]
 
 while not done:

@@ -1,7 +1,7 @@
 import random
 import neat 
 import numpy as np
-
+from settings import w_width, w_height, square_size
 from agent import *
 
 class NEAT_agent(Agent):
@@ -32,7 +32,7 @@ class NEAT_agent(Agent):
         # Get our new input 
         c = self.cell
         c_n = grid.get_cell(self.infront_x,self.infront_y)
-        self.input = (self.degrees, c['r'], c['g'], c['b'], c_n['r'], c_n['g'], c_n['b'])
+        self.input = (self.spike_extended, self.degrees, c['r'], c['g'], c['b'], c_n['r'], c_n['g'], c_n['b'])
 
         output = self.brain.activate(self.input)
 
@@ -45,6 +45,10 @@ class NEAT_agent(Agent):
         if output[2] > 0.5:
             super().move("left")
             self.last_action = "left"
+        if output[3] > 0.5:
+            self.spike_extended = True
+        else:
+            self.spike_extended = False
 
 class Population():
     def __init__(self, grid, screen, genomes, config):
@@ -55,8 +59,8 @@ class Population():
         for _, g in genomes:
             net = neat.nn.RecurrentNetwork.create(g, config)
             g.fitness = 0
-            x = random.randint(0,w_width-100)
-            y = random.randint(0,w_height-100)
+            x = w_width//2 + random.randint(1,w_width//square_size//3) * square_size
+            y = w_height//2 + random.randint(1,w_height//square_size//3) * square_size
             self.agents.append(NEAT_agent(x,y,grid,net,g))
 
 
